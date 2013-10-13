@@ -6,10 +6,9 @@
 ;; TODO NOT SYNCRONIZED
 ;; TODO ASYNC UPDATE
 ;; TODO Failsafe implementation
-;; TODO Avoid repetitions
-;; TODO skip albums
-;; TODO increase search cache
 ;; TODO search random
+;; TODO increase search cache
+;; TODO no cache cleanup
 
 (def RANDOM_ENDPOINT "https://api.imgur.com/3/gallery/random/random/")
 (def SEARCH_ENDPOINT "https://api.imgur.com/3/gallery/search/time/0?")
@@ -20,20 +19,23 @@
 (def random-cache (atom []))
 (def search-cache (atom {}))
 
+(defn- imgur-image-page-processor [response]
+  (->> response
+       :body
+       (#(json/read-str % :key-fn keyword))
+       :data
+       (filterv (complement :is_album))))
+
 (defn- random-images []
   "Returns one page of random images."
-  (:data
-   (json/read-str (:body (http/get RANDOM_ENDPOINT AUTH_HEADER))
-                  :key-fn keyword)))
+  (->> (http/get RANDOM_ENDPOINT AUTH_HEADER)
+       imgur-image-page-processor))
 
 (defn- search-images [query]
   "Return one page of images matches the query."
-  (:data
-   (json/read-str (:body (http/get SEARCH_ENDPOINT 
-                                   (assoc AUTH_HEADER 
-                                     :query-params {"q" query})))
-                  :key-fn keyword)))
-
+  (->> (http/get SEARCH_ENDPOINT (assoc AUTH_HEADER
+                                   :query-params {"q" query}))
+       imgur-image-page-processor))
 
 ;; Part of public API
 

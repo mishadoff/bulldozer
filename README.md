@@ -52,10 +52,11 @@ Though, there is a function to simplify that
 - Limits from provider
 - Imgur return pages of pictures, that means first request takes few
 seconds to return image, but later we cache them.
-- NO failsafe implementation yet
+- No failsafe implementation yet
 - Not synchronized cache
 - Not configurable cache
-- NO async loading data when the cache is empty
+- No cache expiration/cleanup
+- No async loading data when the cache is empty
 - Library uses bulldozer CLIENT_ID for authorization, need separate it to properties and let user change it 
 
 ## License
