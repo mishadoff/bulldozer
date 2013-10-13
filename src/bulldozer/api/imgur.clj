@@ -3,7 +3,8 @@
             [clojure.data.json :as json]
             [bulldozer.string :as s]))
 
-;; TODO NOT SYNC
+;; TODO NOT SYNCRONIZED
+;; TODO ASYNC UPDATE
 ;; TODO Failsafe implementation
 ;; TODO Avoid repetitions
 ;; TODO skip albums
@@ -50,5 +51,6 @@
            (let [e (last res) popped (pop res)]
              (swap! search-cache assoc query popped) e)))))
 
-(defn link-medium [link]
-  (clojure.string/replace link #"(.png|.jpg|.gif)" "m$1"))
+(defn link-scale [link size]
+  (let [k (get (zipmap [:s :b :t :m :l :h] "sbtmlh") size "")]
+    (clojure.string/replace link #"(.png|.jpg|.gif)" (str k "$1"))))
