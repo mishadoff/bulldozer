@@ -1,14 +1,13 @@
 (ns bulldozer.api.imgur
   (:require [clj-http.client :as http]
-            [clojure.data.json :as json]
-            [bulldozer.string :as s]))
+            [clojure.data.json :as json]))
 
-;; TODO NOT SYNCRONIZED
-;; TODO ASYNC UPDATE
-;; TODO Failsafe implementation
-;; TODO search random
-;; TODO increase search cache
-;; TODO no cache cleanup
+;; TODO NOT SYNCRONIZED // Not critical
+;; TODO ASYNC UPDATE // Not critical
+;; TODO Failsafe implementation // Critical
+;; TODO search random ??? // Not critical
+;; TODO increase search cache // Not critical
+;; TODO quota checker [1] // Not critical
 
 (def RANDOM_ENDPOINT "https://api.imgur.com/3/gallery/random/random/")
 (def SEARCH_ENDPOINT "https://api.imgur.com/3/gallery/search/time/0?")
@@ -41,8 +40,9 @@
 
 (defn get-image
   ([]
-     (if (empty? @random-cache)
-       (reset! random-cache (random-images)))
+     (cond (empty? @random-cache)
+           (reset! random-cache (random-images)))
+           ;; async case
      (let [e (last @random-cache)]
        (swap! random-cache pop) e))
   ([query]
@@ -53,6 +53,16 @@
            (let [e (last res) popped (pop res)]
              (swap! search-cache assoc query popped) e)))))
 
+;; TODO case!
 (defn link-scale [link size]
   (let [k (get (zipmap [:s :b :t :m :l :h] "sbtmlh") size "")]
-    (clojure.string/replace link #"(.png|.jpg|.gif)" (str k "$1"))))
+    (clojure.string/replace link #"(?i)(.png|.jpg|.gif)$" (str k "$1"))))
+
+;; Cache management
+
+(defn clean-random-cache []
+  (reset! random-cache []))
+
+(defn clean-search-cache 
+  ([] (reset! search-cache {}))
+  ([key] (swap! search-cache dissoc key))) 

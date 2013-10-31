@@ -4,7 +4,7 @@ Gather data.
 
 ## Available sources
 
-- [Imgur](http://imgur.com/)(In development)
+- [Imgur](http://imgur.com/) (In development)
 
 ## Imgur
 
@@ -24,7 +24,7 @@ You can get some random image link
 or random image by keyword
 
 ``` clojure
-(get-image "cat") => {:link "http://i.imgur.com/catcat.png"
+(get-image "cat") => {:link "http://i.imgur.com/catdog.png"
 	                  :width 1200
 					  :height 1000
 					  :title "Cat kills Dog"}
@@ -53,6 +53,7 @@ Though, there is a function to simplify that
 - Imgur return pages of pictures, that means first request takes few
 seconds to return image, but later we cache them.
 - No failsafe implementation yet
+- No functionality to check user quota
 - Not synchronized cache
 - Not configurable cache
 - No cache expiration/cleanup
