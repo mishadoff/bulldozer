@@ -15,15 +15,27 @@
 (def AUTH_HEADER {:headers {"Authorization" 
                             (str "Client-ID " CLIENT_ID)}})
 
-(def random-cache (atom []))
-(def search-cache (atom {}))
+(def random-cache (agent (clojure.lang.PersistentQueue/EMPTY)))
+(def search-cache (ref {}))
 
-(defn- imgur-image-page-processor [response]
-  (->> response
+(defmulti process-response :status)
+
+(defmethod process-response 200 [response]
+  (->> response 
        :body
        (#(json/read-str % :key-fn keyword))
        :data
-       (filterv (complement :is_album))))
+       (filterv (complement :is_album))       
+       (list :ok)
+       (zipmap [:status :data])))
+
+(defmethod process-response :default [response]
+  {:status :error
+   :message (:error response)
+   :data []})
+
+(defn- imgur-image-page-processor [response]
+  (process-response response))
 
 (defn- random-images []
   "Returns one page of random images."
@@ -36,6 +48,7 @@
                                    :query-params {"q" query}))
        imgur-image-page-processor))
 
+;; TODO error handling
 (defn quota []
   "Returns remaining quota"
   (->> (http/get "https://api.imgur.com/3/credits" AUTH_HEADER)
@@ -44,15 +57,25 @@
        :data
        ))
 
+(defn- retrieve-from-cache [cache]
+  (let [e (first @cache)]
+    (send cache pop)
+    e))
+
 ;; Part of public API
 
 (defn get-image
   ([]
-     (cond (empty? @random-cache)
-           (reset! random-cache (random-images)))
-           ;; async case
-     (let [e (last @random-cache)]
-       (swap! random-cache pop) e))
+     (cond (empty? @random-cache) ;; perform initial caching
+           (do
+             (send random-cache #(apply conj % (:data (random-images)))) ;; async cache loading
+             (await random-cache)
+             (retrieve-from-cache random-cache))
+           (< (count @random-cache) 20) ;; cache is close to be exhausted
+           (do
+             (send random-cache #(apply conj % (:data (random-images))))
+             (retrieve-from-cache random-cache))
+           :else (retrieve-from-cache random-cache)))
   ([query]
      (if (empty? (get @search-cache query []))
        (swap! search-cache assoc query (search-images query)))
@@ -67,9 +90,5 @@
 
 ;; Cache management
 
-(defn clean-random-cache []
-  (reset! random-cache []))
+;; Clean Cache will be available later under another package
 
-(defn clean-search-cache 
-  ([] (reset! search-cache {}))
-  ([key] (swap! search-cache dissoc key))) 
