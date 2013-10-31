@@ -47,13 +47,19 @@ Though, there is a function to simplify that
 (link-scale "http://i.imgur.com/12345.jpg" :m) => "http://i.imgur.com/12345m.jpg"
 ```
 
+Imgur have some limitations for number of request, what you can inspect by `quota` function
+
+``` clojure
+(:UserRemaining (quota)) => 491
+(:ClientRemaining (quota)) => 12491
+```
+
 ### Current limitations
 
 - Limits from provider
 - Imgur return pages of pictures, that means first request takes few
 seconds to return image, but later we cache them.
 - No failsafe implementation yet
-- No functionality to check user quota
 - Not synchronized cache
 - Not configurable cache
 - No cache expiration/cleanup

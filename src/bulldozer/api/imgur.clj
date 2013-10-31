@@ -7,7 +7,7 @@
 ;; TODO Failsafe implementation // Critical
 ;; TODO search random ??? // Not critical
 ;; TODO increase search cache // Not critical
-;; TODO quota checker [1] // Not critical
+;; TODO How to apply paging?
 
 (def RANDOM_ENDPOINT "https://api.imgur.com/3/gallery/random/random/")
 (def SEARCH_ENDPOINT "https://api.imgur.com/3/gallery/search/time/0?")
@@ -36,6 +36,14 @@
                                    :query-params {"q" query}))
        imgur-image-page-processor))
 
+(defn quota []
+  "Returns remaining quota"
+  (->> (http/get "https://api.imgur.com/3/credits" AUTH_HEADER)
+       :body
+       (#(json/read-str % :key-fn keyword))
+       :data
+       ))
+
 ;; Part of public API
 
 (defn get-image
@@ -53,7 +61,6 @@
            (let [e (last res) popped (pop res)]
              (swap! search-cache assoc query popped) e)))))
 
-;; TODO case!
 (defn link-scale [link size]
   (let [k (get (zipmap [:s :b :t :m :l :h] "sbtmlh") size "")]
     (clojure.string/replace link #"(?i)(.png|.jpg|.gif)$" (str k "$1"))))
