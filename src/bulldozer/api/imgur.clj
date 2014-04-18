@@ -3,7 +3,6 @@
             [clojure.data.json :as json]))
 
 ;; TODO NOT SYNCRONIZED // Not critical
-;; TODO ASYNC UPDATE // Not critical
 ;; TODO Failsafe implementation // Critical
 ;; TODO search random ??? // Not critical
 ;; TODO increase search cache // Not critical
@@ -64,12 +63,13 @@
 
 ;; Part of public API
 
+;; TODO not synchronized
 (defn get-image
   ([]
      (cond (empty? @random-cache) ;; perform initial caching
            (do
              (send random-cache #(apply conj % (:data (random-images)))) ;; async cache loading
-             (await random-cache)
+             (await random-cache) ;; TODO need timeout, handler
              (retrieve-from-cache random-cache))
            (< (count @random-cache) 20) ;; cache is close to be exhausted
            (do
@@ -90,5 +90,4 @@
 
 ;; Cache management
 
-;; Clean Cache will be available later under another package
-
+;; Clean Cache will be available later under another module
