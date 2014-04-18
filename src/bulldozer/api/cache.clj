@@ -17,7 +17,9 @@
 (defn- fill-sync [cache]
   "Fill cache synchronously"
   (let [fun (:fun @cache) data (fun)
-        conjed (apply conj (:cache @cache) data)]
+        conjed (if (empty? data)
+                 (:cache @cache)
+                 (apply conj (:cache @cache) data))]
     (reset! cache {:cache conjed :fun fun})))
 
 (defn retrieve [cache]
