@@ -1,6 +1,7 @@
 (ns bulldozer.api.imgur
   (:require [clj-http.client :as http]
-            [clojure.data.json :as json]))
+            [clojure.data.json :as json]
+            [bulldozer.cache :as cache]))
 
 ;; TODO NOT SYNCRONIZED // Not critical
 ;; TODO Failsafe implementation // Critical
@@ -17,6 +18,8 @@
 (def CLIENT_ID "fb3657d87b4a7c1")
 (def AUTH_HEADER {:headers {"Authorization" 
                             (str "Client-ID " CLIENT_ID)}})
+
+;; CACHE
 
 (defmulti process-response :status)
 
@@ -61,14 +64,24 @@
   ([] (:data (random-images)))
   ([query] (:data (search-images query))))
 
+;;; CACHE ;;;
+
+(def random-cache (cache/create-cache get-images))
+(def query-cache (atom {}))
+
+;;;;;;;;;;;;;
+
 (defn get-image
-  ([] (rand-nth (get-images)))
-  ([query] (rand-nth (get-images query))))
+  ([] (cache/retrieve random-cache))
+  ([query]
+     (let [cache (get @query-cache query)]
+       (if cache
+         (cache/retrieve cache)
+         ;; not found
+         (let [cache (cache/create-cache #(get-images query))]
+           (swap! query-cache assoc query cache)
+           (cache/retrieve cache))))))
 
 (defn link-scale [link size]
   (let [k (get (zipmap [:s :b :t :m :l :h] "sbtmlh") size "")]
     (clojure.string/replace link #"(?i)(.png|.jpg|.gif)$" (str k "$1"))))
-
-;; Cache management
-
-;; Clean Cache will be available later under another module
