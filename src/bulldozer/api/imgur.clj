@@ -72,6 +72,14 @@
 ;;;;;;;;;;;;;
 
 (defn get-image
+  "Obtain one random image or random image with
+specified keyword.
+
+Simple cache is used. First time you perform request
+it can take some time, because imgur return multiple images
+per request. Result will be cached and perform instant
+response until cache is exhausted.
+"
   ([] (cache/retrieve random-cache))
   ([query]
      (let [cache (get @query-cache query)]
@@ -81,6 +89,8 @@
          (let [cache (cache/create-cache #(get-images query))]
            (swap! query-cache assoc query cache)
            (cache/retrieve cache))))))
+
+;; Additional methods
 
 (defn link-scale [link size]
   (let [k (get (zipmap [:s :b :t :m :l :h] "sbtmlh") size "")]

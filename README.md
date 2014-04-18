@@ -5,6 +5,7 @@ Gather data.
 ## Available sources
 
 - [Imgur](http://imgur.com/) (In development)
+- [Gist](http://gist.github.com/) (In development)
 
 ## Imgur
 
@@ -32,6 +33,8 @@ or random image by keyword
 
 Full list of image properties [here](http://api.imgur.com/models/image#model)
 
+### Additional features
+
 To simplify scaling for big pictures, imgur have some conventions to links they provide. Just add <suffix> to the end of filename.
 
 - **s** (small square 90x90)
@@ -54,17 +57,9 @@ Imgur have some limitations for number of request, what you can inspect by `quot
 (:ClientRemaining (quota)) => 12491
 ```
 
-### Current limitations
+## Gist
 
-- Limits from provider
-- Imgur return pages of pictures, that means first request takes few
-seconds to return image, but later we cache them.
-- No failsafe implementation yet
-- Not synchronized cache
-- Not configurable cache
-- No cache expiration/cleanup
-- No async loading data when the cache is empty
-- Library uses bulldozer CLIENT_ID for authorization, need separate it to properties and let user change it 
+;; TODO
 
 ## License
 
