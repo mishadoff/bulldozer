@@ -1,35 +1,31 @@
 (ns bulldozer.cache)
 
-;; Synchronized cache implementation based on 
+;; Simple stupid cache implementation based on 
 ;; clojure.lang.PersistentQueue
 
-(defn create-cache []
-  {:cache (ref (clojure.lang.PersistentQueue/EMPTY))
-   :agent (agent 0)
-   :min 5})
+(defn create-cache [fun]
+  (atom
+   {:cache (clojure.lang.PersistentQueue/EMPTY)
+    :fun fun}))
 
 (defn- retrieve-from [cache]
-  (dosync
-   (let [e (first @cache)]
-     (alter cache pop) e)))
+  (let [q (:cache @cache) 
+        popped (pop q)]
+    (reset! cache {:cache popped :fun (:fun @cache)})
+    (first q)))
 
-(defn- fill-sync [cache stream]
-  (dosync
-   (alter cache #(apply conj % (stream)))))
+(defn- fill-sync [cache]
+  "Fill cache synchronously"
+  (let [fun (:fun @cache) data (fun)
+        conjed (apply conj (:cache @cache) data)]
+    (reset! cache {:cache conjed :fun fun})))
 
-(defn- fill-async [cache agent stream]
-  
-
-(defn retrieve [cache-map stream]
-  (let [cache (:cache cache-map)]
+(defn retrieve [cache]
+  (let [q (:cache @cache)]
     (cond
-     (empty? @cache) 
+     (empty? q) 
      (do
-       (fill-sync cache stream)
-       (retrieve-from cache))
-     (< (count @cache) (:min cache-map))
-     (do
-       (fill-async cache (future (stream)))
+       (fill-sync cache)
        (retrieve-from cache))
      :else
      (retrieve-from cache))))
