@@ -7,15 +7,16 @@
 ;; TODO search random ??? // Not critical
 ;; TODO increase search cache // Not critical
 ;; TODO How to apply paging?
+;; TODO dynamic bindings 
 
-(def RANDOM_ENDPOINT "https://api.imgur.com/3/gallery/random/random/")
-(def SEARCH_ENDPOINT "https://api.imgur.com/3/gallery/search/time/0?")
+
+(def RANDOM_ENDPOINT
+  "https://api.imgur.com/3/gallery/random/random/")
+(def SEARCH_ENDPOINT
+  "https://api.imgur.com/3/gallery/search/time/0?")
 (def CLIENT_ID "fb3657d87b4a7c1")
 (def AUTH_HEADER {:headers {"Authorization" 
                             (str "Client-ID " CLIENT_ID)}})
-
-(def random-cache (agent (clojure.lang.PersistentQueue/EMPTY)))
-(def search-cache (ref {}))
 
 (defmulti process-response :status)
 
@@ -56,33 +57,13 @@
        :data
        ))
 
-(defn- retrieve-from-cache [cache]
-  (let [e (first @cache)]
-    (send cache pop)
-    e))
+(defn get-images
+  ([] (:data (random-images)))
+  ([query] (:data (search-images query))))
 
-;; Part of public API
-
-;; TODO not synchronized
 (defn get-image
-  ([]
-     (cond (empty? @random-cache) ;; perform initial caching
-           (do
-             (send random-cache #(apply conj % (:data (random-images)))) ;; async cache loading
-             (await random-cache) ;; TODO need timeout, handler
-             (retrieve-from-cache random-cache))
-           (< (count @random-cache) 20) ;; cache is close to be exhausted
-           (do
-             (send random-cache #(apply conj % (:data (random-images))))
-             (retrieve-from-cache random-cache))
-           :else (retrieve-from-cache random-cache)))
-  ([query]
-     (if (empty? (get @search-cache query []))
-       (swap! search-cache assoc query (search-images query)))
-     (let [res (get @search-cache query [])]
-       (if (empty? res) "NO IMAGE" ;; handle later
-           (let [e (last res) popped (pop res)]
-             (swap! search-cache assoc query popped) e)))))
+  ([] (rand-nth (get-images)))
+  ([query] (rand-nth (get-images query))))
 
 (defn link-scale [link size]
   (let [k (get (zipmap [:s :b :t :m :l :h] "sbtmlh") size "")]

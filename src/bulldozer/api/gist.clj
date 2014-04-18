@@ -6,7 +6,7 @@
 ;; Other 60
 
 ;; TODO authentication
-
+;; TODO expose other parts of gist for duplicate detection
 (defn get-snippets [page]
   "return list of pairs [language raw_url] from gist page"
   (->> (str "https://api.github.com/gists/public?page=" page)
