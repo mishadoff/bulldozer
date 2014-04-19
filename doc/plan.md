@@ -15,3 +15,8 @@ Need additional investigation of quotas or service availability
   - Google
   - Twitter
   - Generate from English Grammar
+
+- Code
+  - Github
+  - Gist
+  - Ohloh

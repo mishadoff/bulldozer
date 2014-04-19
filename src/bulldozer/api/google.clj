@@ -1,15 +1,11 @@
-(ns bulldozer.gist
-  (:require [clj-http.client :as http])
-  (:require [clojure.data.json :as json]))
+(ns bulldozer.api.google
+  (:require [clj-http.client :as http]
+            [clojure.data.json :as json]
+            [bulldozer.cache :as cache]))
 
-;; Authenticated user 5000 per hour
-;; Other 60
+(def IMAGES_API "http://ajax.googleapis.com/ajax/services/search/images?v=1.0&q=clojure")
 
-(def GIST_PUBLIC "https://api.github.com/gists/public?page=")
-
-;; TODO authentication
-;; TODO expose other parts of gist for duplicate detection
-(defn get-snippets [page]
+#_(defn get-images [page]
   "return list of pairs [language raw_url] from gist page"
   (->> (str GIST_PUBLIC page)
        (http/get)
@@ -24,6 +20,4 @@
        (map (fn [[lang link]] [lang (slurp link)]))
        )) 
 
-;; TODO no cache yet
-(defn get-code []
-  (rand-nth (get-snippets (inc (rand-int 100)))))
+

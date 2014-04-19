@@ -3,14 +3,6 @@
             [clojure.data.json :as json]
             [bulldozer.cache :as cache]))
 
-;; TODO NOT SYNCRONIZED // Not critical
-;; TODO Failsafe implementation // Critical
-;; TODO search random ??? // Not critical
-;; TODO increase search cache // Not critical
-;; TODO How to apply paging?
-;; TODO dynamic bindings 
-
-
 (def RANDOM_ENDPOINT
   "https://api.imgur.com/3/gallery/random/random/")
 (def SEARCH_ENDPOINT
@@ -93,5 +85,5 @@ response until cache is exhausted.
 ;; Additional methods
 
 (defn link-scale [link size]
-  (let [k (get (zipmap [:s :b :t :m :l :h] "sbtmlh") size "")]
+  (let [k ((zipmap [:s :b :t :m :l :h] "sbtmlh") size "")]
     (clojure.string/replace link #"(?i)(.png|.jpg|.gif)$" (str k "$1"))))
