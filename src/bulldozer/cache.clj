@@ -24,7 +24,8 @@
 (defn- fill-sync [cache]
   "Fill cache synchronously"
   (let [fun (:fun @cache)
-        data (apply fun :page (:initpage @cache))
+        page (:initpage @cache)
+        data (if page (fun page) (fun))
         conjed (if (empty? data)
                  (:cache @cache)
                  (apply conj (:cache @cache) data))]
