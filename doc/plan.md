@@ -1,12 +1,12 @@
 # Plan
 
-Need additional investigation of quotas or service availability
+## Sources (full doc + limitations)
 
 - Images
   - Imgur (free 12500 requests per day)
+  - Google Images (64 images per query)
   - Instagram
   - Pinterest
-  - Google Images
   - Yahoo Images
   - Bing Images
   - Flickr
@@ -20,3 +20,9 @@ Need additional investigation of quotas or service availability
   - Github
   - Gist
   - Ohloh
+
+
+## Unified API
+
+- Images
+- Text

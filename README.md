@@ -5,6 +5,7 @@ Gather data.
 ## Available sources
 
 - [Imgur](http://imgur.com/) (In development)
+- [Google Images](https://www.google.com.ua/imghp) (In development)
 - [Gist](http://gist.github.com/) (In development)
 
 ## Imgur

@@ -21,6 +21,9 @@
                    :pagesize (:pagesize @cache)})
     (first q)))
 
+(defn- safe-add [a b]
+  (if (or (nil? a) (nil? b)) nil (+ a b)))
+
 (defn- fill-sync [cache]
   "Fill cache synchronously"
   (let [fun (:fun @cache)
@@ -31,8 +34,8 @@
                  (apply conj (:cache @cache) data))]
     (reset! cache {:cache conjed
                    :fun fun
-                   :initpage (+ (:initpage @cache)
-                                (:pagesize @cache))
+                   :initpage (safe-add (:initpage @cache)
+                                       (:pagesize @cache))
                    :pagesize (:pagesize @cache)})))
 
 (defn retrieve [cache]

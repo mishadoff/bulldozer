@@ -43,3 +43,26 @@ per request query."
                       :pagesize 4)]
            (swap! query-cache assoc query cache)
            (cache/retrieve cache))))))
+
+;; TODO think about structure
+(defn unify
+  "Convert google image properties to unified image format.
+
+Unified image format consist of following properties:
+[:id :source :width :height :link :title :content
+     :preview-link :preview-height :preview-width] 
+"
+  [{:keys [imageId
+           width
+           height
+           url
+           tbWidth
+           tbHeight
+           tbUrl
+           contentNoFormatting
+           titleNoFormatting] :as google-image}]
+  {:id imageId :source :google
+   :link url :preview-link tbUrl 
+   :width width :preview-width tbWidth
+   :height height :preview-height tbHeight
+   :title titleNoFormatting :content contentNoFormatting})
