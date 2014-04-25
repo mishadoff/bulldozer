@@ -3,8 +3,6 @@
             [clojure.data.json :as json]
             [bulldozer.cache :as cache]))
 
-;; 64 Images per query
-
 (def IMAGES_API "http://ajax.googleapis.com/ajax/services/search/images?v=1.0")
 
 (defn get-images-for-page
@@ -17,12 +15,10 @@
        (:responseData)
        (:results)))
 
-;;;; CACHE
-
 (def query-cache (atom {}))
 
 (defn get-image
-  "Obtain one random by specified keyword.
+  "Obtain one random image by specified keyword.
 
 Simple cache is used. First time you perform request
 it can take some time, because google returns multiple images
@@ -63,6 +59,6 @@ Unified image format consist of following properties:
            titleNoFormatting] :as google-image}]
   {:id imageId :source :google
    :link url :preview-link tbUrl 
-   :width width :preview-width tbWidth
-   :height height :preview-height tbHeight
+   :width (Integer/parseInt width) :preview-width (Integer/parseInt tbWidth)
+   :height (Integer/parseInt height) :preview-height (Integer/parseInt tbHeight)
    :title titleNoFormatting :content contentNoFormatting})

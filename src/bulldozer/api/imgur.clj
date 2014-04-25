@@ -7,11 +7,10 @@
   "https://api.imgur.com/3/gallery/random/random/")
 (def SEARCH_ENDPOINT
   "https://api.imgur.com/3/gallery/search/time/0?")
+
 (def CLIENT_ID "fb3657d87b4a7c1")
 (def AUTH_HEADER {:headers {"Authorization" 
                             (str "Client-ID " CLIENT_ID)}})
-
-;; CACHE
 
 (defmulti process-response :status)
 
