@@ -3,11 +3,12 @@
             [clojure.data.json :as json]
             [bulldozer.cache :as cache]))
 
-(def IMAGES_API "http://ajax.googleapis.com/ajax/services/search/images?v=1.0")
+(def ^:private IMAGES_API
+  "http://ajax.googleapis.com/ajax/services/search/images?v=1.0")
 
-(defn get-images-for-page
+(defn- get-images-for-page
   [query page]
-  "return list of pairs [language raw_url] from gist page"
+  "return one page of google images by query"
   (->> (http/get IMAGES_API {:query-params {"q" query
                                             "start" page}})
        :body
@@ -15,19 +16,16 @@
        :responseData
        :results))
 
-(def query-cache (atom {}))
+(def ^:private query-cache (atom {}))
 
-(defn get-image
+(defn invalidate-cache
+  ([] (reset! query-cache {}))
+  ([query] (swap! query-cache dissoc query)))
+
+(defn get-raw-image
   "Obtain one random image by specified keyword.
-
-Simple cache is used. First time you perform request
-it can take some time, because google returns multiple images
-per request. Result will be cached and perform instant
-response until cache is exhausted.
-
-API is actually deprecated, but works.
-Keep in mind that 64 is a maximum number of images
-per request query."
+Return results according to service.
+"
   ([query]
      (let [cache (get @query-cache query)]
        (if cache
@@ -40,7 +38,7 @@ per request query."
            (swap! query-cache assoc query cache)
            (cache/retrieve cache))))))
 
-(defn unify
+(defn- unify
   "Convert google image properties to unified image format.
 
 Unified image format consist of following properties:
@@ -62,3 +60,7 @@ Unified image format consist of following properties:
      :width (Integer/parseInt width) :preview-width (Integer/parseInt tbWidth)
      :height (Integer/parseInt height) :preview-height (Integer/parseInt tbHeight)
      :title titleNoFormatting :content contentNoFormatting}))
+
+(defn get-image [query]
+  "Return one unified image"
+  (unify (get-raw-image query)))

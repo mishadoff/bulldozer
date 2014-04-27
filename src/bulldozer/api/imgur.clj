@@ -3,9 +3,9 @@
             [clojure.data.json :as json]
             [bulldozer.cache :as cache]))
 
-(def RANDOM_ENDPOINT
+(def ^:private RANDOM_ENDPOINT
   "https://api.imgur.com/3/gallery/random/random/")
-(def SEARCH_ENDPOINT
+(def ^:private SEARCH_ENDPOINT
   "https://api.imgur.com/3/gallery/search/time/0?")
 
 (def CLIENT_ID "fb3657d87b4a7c1")
@@ -48,10 +48,9 @@
   (->> (http/get "https://api.imgur.com/3/credits" AUTH_HEADER)
        :body
        (#(json/read-str % :key-fn keyword))
-       :data
-       ))
+       :data))
 
-(defn get-images
+(defn- get-images
   ([] (:data (random-images)))
   ([query] (:data (search-images query))))
 
@@ -62,7 +61,7 @@
 
 ;;;;;;;;;;;;;
 
-(defn get-image
+(defn get-raw-image
   "Obtain one random image or random image with
 specified keyword.
 
@@ -80,6 +79,40 @@ response until cache is exhausted.
          (let [cache (cache/create-cache #(get-images query))]
            (swap! query-cache assoc query cache)
            (cache/retrieve cache))))))
+
+(defn- scaled-size [width height]
+  (cond
+   (and (<= width 160) (<= height 160))
+   [width height]
+   (>= width height)
+   [160 (Math/round (/ height (double (/ width 160))))]
+   :else
+   [(Math/round (/ width (double (/ height 160)))) 160]))
+
+(defn- unify
+  "Convert google image properties to unified image format.
+
+Unified image format consist of following properties:
+[:id :source :width :height :link :title :content
+     :preview-link :preview-height :preview-width] 
+"
+  [{:keys [id
+           width
+           height
+           link
+           description
+           title] :as imgur-image}]
+  (when imgur-image
+    (let [[pw ph] (scaled-size width height)]
+      {:id id :source :imgur
+       :link link :preview-link (link-scale link :t) 
+       :width width :preview-width pw
+       :height height :preview-height ph
+       :title title :content description})))
+
+(defn get-image
+  ([] (unify (get-raw-image)))
+  ([query] (unify (get-raw-image query))))
 
 ;; Additional methods
 
