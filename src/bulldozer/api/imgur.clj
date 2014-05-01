@@ -7,10 +7,14 @@
   "https://api.imgur.com/3/gallery/random/random/")
 (def ^:private SEARCH_ENDPOINT
   "https://api.imgur.com/3/gallery/search/time/0?")
+(def ^:private CREDIT_ENDPOINT
+  "https://api.imgur.com/3/credits")
 
-(def CLIENT_ID "fb3657d87b4a7c1")
-(def AUTH_HEADER {:headers {"Authorization" 
-                            (str "Client-ID " CLIENT_ID)}})
+(def ^:dynamic *CLIENT_ID* "fb3657d87b4a7c1")
+
+(defn- auth-header []
+  {:headers {"Authorization" 
+             (str "Client-ID " *CLIENT_ID*)}})
 
 (defmulti process-response :status)
 
@@ -33,19 +37,18 @@
 
 (defn- random-images []
   "Returns one page of random images."
-  (->> (http/get RANDOM_ENDPOINT AUTH_HEADER)
+  (->> (http/get RANDOM_ENDPOINT (auth-header))
        imgur-image-page-processor))
 
 (defn- search-images [query]
   "Return one page of images matches the query."
-  (->> (http/get SEARCH_ENDPOINT (assoc AUTH_HEADER
+  (->> (http/get SEARCH_ENDPOINT (assoc (auth-header)
                                    :query-params {"q" query}))
        imgur-image-page-processor))
 
-;; TODO error handling
 (defn quota []
   "Returns remaining quota"
-  (->> (http/get "https://api.imgur.com/3/credits" AUTH_HEADER)
+  (->> (http/get CREDIT_ENDPOINT (auth-header))
        :body
        (#(json/read-str % :key-fn keyword))
        :data))
@@ -89,8 +92,16 @@ response until cache is exhausted.
    :else
    [(Math/round (/ width (double (/ height 160)))) 160]))
 
+;;;;   Additional methods
+
+(defn link-scale [link size]
+  (let [k ((zipmap [:s :b :t :m :l :h] "sbtmlh") size "")]
+    (clojure.string/replace link #"(?i)(.png|.jpg|.gif)$" (str k "$1"))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (defn- unify
-  "Convert google image properties to unified image format.
+  "Convert imgur image properties to unified image format.
 
 Unified image format consist of following properties:
 [:id :source :width :height :link :title :content
@@ -113,9 +124,3 @@ Unified image format consist of following properties:
 (defn get-image
   ([] (unify (get-raw-image)))
   ([query] (unify (get-raw-image query))))
-
-;; Additional methods
-
-(defn link-scale [link size]
-  (let [k ((zipmap [:s :b :t :m :l :h] "sbtmlh") size "")]
-    (clojure.string/replace link #"(?i)(.png|.jpg|.gif)$" (str k "$1"))))
