@@ -48,7 +48,7 @@ Unified image format consist of following properties:
   [{:keys [imageId
            width
            height
-           url
+           unescapedUrl
            tbWidth
            tbHeight
            tbUrl
@@ -56,7 +56,7 @@ Unified image format consist of following properties:
            titleNoFormatting] :as google-image}]
   (when google-image
     {:id imageId :source :google
-     :link url :preview-link tbUrl 
+     :link unescapedUrl :preview-link tbUrl 
      :width (Integer/parseInt width) :preview-width (Integer/parseInt tbWidth)
      :height (Integer/parseInt height) :preview-height (Integer/parseInt tbHeight)
      :title titleNoFormatting :content contentNoFormatting}))
