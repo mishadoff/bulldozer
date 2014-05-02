@@ -59,8 +59,14 @@
 
 ;;; CACHE ;;;
 
-(def random-cache (cache/create-cache get-images))
-(def query-cache (atom {}))
+(def ^:private random-cache (cache/create-cache get-images))
+(def ^:private query-cache (atom {}))
+
+(defn invalidate-cache
+  ([]
+     (reset! query-cache {})
+     (reset! random-cache (cache/create-cache get-images)))
+  ([query] (swap! query-cache dissoc query)))
 
 ;;;;;;;;;;;;;
 
@@ -84,6 +90,8 @@ response until cache is exhausted.
            (cache/retrieve cache))))))
 
 (defn- scaled-size [width height]
+  "Scale size width x height to smaller
+with a maximum side of 160"
   (cond
    (and (<= width 160) (<= height 160))
    [width height]
