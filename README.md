@@ -4,99 +4,17 @@ Gather data.
 
 ## Available sources
 
-- [Imgur](http://imgur.com/) (In development)
+- [Imgur](http://imgur.com/)
 - [Google Images](https://www.google.com.ua/imghp)
+
+*In development* 
+
 - [Gist](http://gist.github.com/) (In development)
 
-## Imgur
+## Images
 
-### Usage
-
-`(:use [bulldozer.api.imgur])`
-
-You can get some random image link 
-
-``` clojure
-(get-image) => {:link "http://i.imgur.com/abcdef.png"
-	            :width 600
-				:height 480
-				:title "Image"}
-```
-
-or random image by keyword
-
-``` clojure
-(get-image "cat") => {:link "http://i.imgur.com/catdog.png"
-	                  :width 1200
-					  :height 1000
-					  :title "Cat kills Dog"}
-```
-
-Full list of image properties [here](http://api.imgur.com/models/image#model)
-
-See also: [Unification](#Unification)
-
-### Additional features
-
-To simplify scaling for big pictures, imgur have some conventions to links they provide. Just add <suffix> to the end of filename.
-
-- **s** (small square 90x90)
-- **b** (big square 160x160)
-- **t** (small thumbnail 160x160)
-- **m** (medium thumbnail 320x320)
-- **l** (large thumbnail 640x640)
-- **h** (huge thumbnail 1024x1024)
-
-Though, there is a function to simplify that
-
-``` clojure
-(link-scale "http://i.imgur.com/12345.jpg" :m)
-=> "http://i.imgur.com/12345m.jpg"
-```
-
-Imgur have some limitations for number of request, what you can inspect by `quota` function
-
-``` clojure
-(:UserRemaining (quota)) => 491
-(:ClientRemaining (quota)) => 12491
-```
-
-;; TODO provide client key
-
-## Google Images
-
-`(:use [bulldozer.api.google])`
-
-Google Images api is deprecated but works.
-You can get upto 64 results per search query.
-Results cached.
-
-``` clojure
-(get-image "tarantino") => {:url "http://imdb.com/tarantino.jpg"
-                            :width "640"
-							:height "480"
-							:title "Pulp Fiction in action"}
-```
-
-Full list of image properties [here](https://developers.google.com/image-search/v1/devguide#resultobject)
-
-See also: [Unification](#Unification)
-
-## Gist
-
-;; TODO
-
-## Unification
-
-Every service provides some sort of media result (image, audio, video, etc.) These results may be unified to specific format to simplify usage if more than one service used.
-
-In addition, unification provides standard types for common values despite of what type returned by service.
-
-### Image
-
-`(unify (get-image "cat")`
-
-Image is just a map with following properties
+Every image provider has `(get-image)` or `(get-image "keyword")` or both functions.
+It returns unified image object with the following properties:
 
 * **:id** "abcdefjhijklomnp"
 * **:link** "http://img.com/tarantino.jpg"
@@ -108,6 +26,69 @@ Image is just a map with following properties
 * **:preview-width** 90
 * **:preview-height** 60
 * **:source** :google
+
+Also, there are provider specific properties for image,
+which you can inspect by using `(get-raw-image)` or `(get-raw-image "keyword")` functions.
+
+Some provider implements `(quota)` function, which allows to inspect remaining api usage.
+
+Almost all image providers return multiple result per request, so results are cached
+internally and refreshed when images are exhausted. Such cache can be invalidated by calling
+`(invalidate-cache)` or `(invalidate-cache "keyword")` function.
+
+### Imgur
+
+`(:use [bulldozer.api.imgur])`
+
+* `(get-image)` - random unified image.
+* `(get-image "cat")` - random unified image with cat
+* `(get-raw-image)` - random imgur-specific image, properties [here](http://api.imgur.com/models/image#model)
+* `(get-raw-image "cat")` - random imgur-specific image
+* `(link-scale "http://i.imgur.com/abcde.jpg" :s)`
+  Scale imgur image to specific size. Following sizes supported:
+  * **:s** (small square 90x90)
+  * **:b** (big square 160x160)
+  * **:t** (small thumbnail 160x160)
+  * **:m** (medium thumbnail 320x320)
+  * **:l** (large thumbnail 640x640)
+  * **:h** (huge thumbnail 1024x1024)
+* `(quota)` - api usage info
+  ``` clojure
+  (:UserRemaining (quota)) => 491
+  (:ClientRemaining (quota)) => 12491
+  ```
+* `(invalidate-cache)` - clear all pictures saved to random cache
+* `(invalidate-cache "cat")` - clear all pictures saved to "cat"-cache 
+
+
+Imgur provides `12500` requests for client per day, what is
+approximately `50K` images.
+
+Note, that bulldozer internal `CLIENT_ID` is shared and
+just for test purposes, so if you want to have `12500`
+limit for private usage, register imgur application,
+obtain your own `CLIENT_ID` and override it in requests:
+
+``` clojure
+(binding [*CLIENT_ID* "my-own-client-id"]
+  (get-image "cat"))
+```
+
+### Google Images
+
+Google Images API is actually deprecated, but still works.
+It is able to return upto 64 results per query.
+
+`(:use [bulldozer.api.google])`
+
+* `(get-image "cat")` - random unified image with cat
+* `(get-raw-image "cat")` - random google-specific image, properties [here](https://developers.google.com/image-search/v1/devguide#resultobject)
+* `(invalidate-cache)` - clear all pictures saved to all keyword caches
+* `(invalidate-cache "cat")` - clear all pictures saved to "cat"-cache 
+
+Google provides upto `64` results per query.
+
+Full list of image properties [here](https://developers.google.com/image-search/v1/devguide#resultobject)
 
 ## License
 

@@ -12,9 +12,9 @@
 
 (def ^:dynamic *CLIENT_ID* "fb3657d87b4a7c1")
 
+;; depends on dynamic binding!
 (defn- auth-header []
-  {:headers {"Authorization" 
-             (str "Client-ID " *CLIENT_ID*)}})
+  {:headers {"Authorization" (str "Client-ID " *CLIENT_ID*)}})
 
 (defmulti process-response :status)
 
@@ -35,19 +35,22 @@
 (defn- imgur-image-page-processor [response]
   (process-response response))
 
-(defn- random-images []
+(defn- random-images
   "Returns one page of random images."
+  []
   (->> (http/get RANDOM_ENDPOINT (auth-header))
        imgur-image-page-processor))
 
-(defn- search-images [query]
+(defn- search-images
   "Return one page of images matches the query."
+  [query]
   (->> (http/get SEARCH_ENDPOINT (assoc (auth-header)
                                    :query-params {"q" query}))
        imgur-image-page-processor))
 
-(defn quota []
+(defn quota
   "Returns remaining quota"
+  []
   (->> (http/get CREDIT_ENDPOINT (auth-header))
        :body
        (#(json/read-str % :key-fn keyword))
