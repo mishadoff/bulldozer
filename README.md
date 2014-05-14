@@ -114,6 +114,7 @@ One search query could return upto `1000` results.
 * `(get-tags "ukraine")` - return tags associated with *ukraine*
 * `(invalidate-cache)` - clear all pictures saved to popular all tagged caches
 * `(invalidate-cache "cat")` - clear all pictures saved to "cat"-cache
+* `(quota)` - check remaining quota. *Consumes 1 request*
   
 Instagram provides `5000` requests per hour and one request returns upto `20` images, what is approximately `100K` images/hour.
 

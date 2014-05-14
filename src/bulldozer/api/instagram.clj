@@ -108,4 +108,12 @@ Unified image format consist of following properties:
        :data
        (map :name)))
 
-;; TODO quota
+(defn quota
+  "Check remaining quota. Consumes request"
+  []
+  (->> (http/get TAG_ENDPOINT
+                 {:query-params {"q" "snow"
+                                 "client_id" *CLIENT_ID*}})
+       :headers
+       (#(get % "x-ratelimit-remaining"))
+       (Integer/parseInt)))
