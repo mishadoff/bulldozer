@@ -7,6 +7,7 @@ Gather data.
 - [Imgur](http://imgur.com/)
 - [Google Images](https://www.google.com.ua/imghp)
 - [Bing Images](http://bing.com/)
+- [Instagram](http://instagram.com)
 
 *In development* 
 
@@ -101,6 +102,20 @@ One search query could return upto `64` results.
 Bing provides `5000` requests per month and one request returns upto `50` images, what is approximately `250K` images/month.
 
 One search query could return upto `1000` results.
+
+### Instagram
+
+`(:use [bulldozer.api.instagram])`
+
+* `(get-image)` - random popular unified image
+* `(get-image "cat")` - random unified image tagged as `#cat`
+* `(get-raw-image)` - random popular instagram image
+* `(get-raw-image "cat")` - random instagram image tagged as `#cat`, json example [here](https://api.instagram.com/v1/tags/snow/media/recent?access_token=174476326.f59def8.d3f7b1318aa14744bbbf421b876e3f46)
+* `(get-tags "ukraine")` - return tags associated with *ukraine*
+* `(invalidate-cache)` - clear all pictures saved to popular all tagged caches
+* `(invalidate-cache "cat")` - clear all pictures saved to "cat"-cache
+  
+Instagram provides `5000` requests per hour and one request returns upto `20` images, what is approximately `100K` images/hour.
 
 ## License
 
