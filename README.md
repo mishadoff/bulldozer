@@ -6,7 +6,7 @@ Gather data.
 
 - [Imgur](http://imgur.com/)
 - [Google Images](https://www.google.com.ua/imghp)
-- [Bing](http://bing.com/)
+- [Bing Images](http://bing.com/)
 
 *In development* 
 
@@ -92,11 +92,12 @@ One search query could return upto `64` results.
 `(:use [bulldozer.api.bing])`
 
 * `(get-image "cat")` - random unified image with cat
-* `(get-raw-image "cat")` - random bing-specific image, properties [here](https://developers.google.com/image-search/v1/devguide#resultobject)
+* `(get-raw-image "cat")` - random bing-specific image
 * `(invalidate-cache)` - clear all pictures saved to all keyword caches
 * `(invalidate-cache "cat")` - clear all pictures saved to "cat"-cache
 * `(quota)` - remaining number of requests per month 
   * `(quota) => 4987`
+  
 Bing provides `5000` requests per month and one request returns upto `50` images, what is approximately `250K` images/month.
 
 One search query could return upto `1000` results.
