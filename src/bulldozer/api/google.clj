@@ -33,7 +33,7 @@ Return results according to service.
          ;; not found
          (let [cache (cache/create-cache
                       #(get-images-for-page query %)
-                      :initpage 0
+                      :skip 0
                       :pagesize 4)]
            (swap! query-cache assoc query cache)
            (cache/retrieve cache))))))
@@ -42,8 +42,8 @@ Return results according to service.
   "Convert google image properties to unified image format.
 
 Unified image format consist of following properties:
-[:id :source :width :height :link :title :content
-     :preview-link :preview-height :preview-width] 
+[:id :source :width :height :link :title
+ :preview-link :preview-height :preview-width] 
 "
   [{:keys [imageId
            width
@@ -52,14 +52,16 @@ Unified image format consist of following properties:
            tbWidth
            tbHeight
            tbUrl
-           contentNoFormatting
            titleNoFormatting] :as google-image}]
   (when google-image
     {:id imageId :source :google
-     :link unescapedUrl :preview-link tbUrl 
-     :width (Integer/parseInt width) :preview-width (Integer/parseInt tbWidth)
-     :height (Integer/parseInt height) :preview-height (Integer/parseInt tbHeight)
-     :title titleNoFormatting :content contentNoFormatting}))
+     :link unescapedUrl
+     :preview-link tbUrl 
+     :width (Integer/parseInt width)
+     :preview-width (Integer/parseInt tbWidth)
+     :height (Integer/parseInt height)
+     :preview-height (Integer/parseInt tbHeight)
+     :title titleNoFormatting}))
 
 (defn get-image [query]
   "Return one unified image"

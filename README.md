@@ -6,6 +6,7 @@ Gather data.
 
 - [Imgur](http://imgur.com/)
 - [Google Images](https://www.google.com.ua/imghp)
+- [Bing](http://bing.com/)
 
 *In development* 
 
@@ -21,7 +22,6 @@ It returns unified image object with the following properties:
 * **:width** 600
 * **:height** 400
 * **:title** "Quentin Tarantino"
-* **:content** "Director works on his new film"
 * **:preview-link** "http://img.com/tarantino_small.jpg"
 * **:preview-width** 90
 * **:preview-height** 60
@@ -44,7 +44,7 @@ internally and refreshed when images are exhausted. Such cache can be invalidate
 * `(get-image "cat")` - random unified image with cat
 * `(get-raw-image)` - random imgur-specific image, properties [here](http://api.imgur.com/models/image#model)
 * `(get-raw-image "cat")` - random imgur-specific image
-* `(link-scale "http://i.imgur.com/abcde.jpg" :s)`
+* `(link-scale "http://i.imgur.com/abcde.jpg" :s)`  
   Scale imgur image to specific size. Following sizes supported:
   * **:s** (small square 90x90)
   * **:b** (big square 160x160)
@@ -53,21 +53,19 @@ internally and refreshed when images are exhausted. Such cache can be invalidate
   * **:l** (large thumbnail 640x640)
   * **:h** (huge thumbnail 1024x1024)
 * `(quota)` - api usage info
-  ``` clojure
-  (:UserRemaining (quota)) => 491
-  (:ClientRemaining (quota)) => 12491
-  ```
+  * `(:UserRemaining (quota))` => 491
+  * `(:ClientRemaining (quota))` => 12491
 * `(invalidate-cache)` - clear all pictures saved to random cache
 * `(invalidate-cache "cat")` - clear all pictures saved to "cat"-cache 
 
 
 Imgur provides `12500` requests for client per day, what is
-approximately `50K` images.
+approximately `50K` images/day.
 
-Note, that bulldozer internal `CLIENT_ID` is shared and
+Note, that bulldozer internal `*CLIENT_ID*` is shared and
 just for test purposes, so if you want to have `12500`
 limit for private usage, register imgur application,
-obtain your own `CLIENT_ID` and override it in requests:
+obtain your own `*CLIENT_ID*` and override it in requests:
 
 ``` clojure
 (binding [*CLIENT_ID* "my-own-client-id"]
@@ -77,7 +75,6 @@ obtain your own `CLIENT_ID` and override it in requests:
 ### Google Images
 
 Google Images API is actually deprecated, but still works.
-It is able to return upto 64 results per query.
 
 `(:use [bulldozer.api.google])`
 
@@ -86,9 +83,22 @@ It is able to return upto 64 results per query.
 * `(invalidate-cache)` - clear all pictures saved to all keyword caches
 * `(invalidate-cache "cat")` - clear all pictures saved to "cat"-cache 
 
-Google provides upto `64` results per query.
+Google provides `100` requests per day and one request returns upto `8` images, what is approximately `800` images/day. 
 
-Full list of image properties [here](https://developers.google.com/image-search/v1/devguide#resultobject)
+One search query could return upto `64` results.
+
+### Bing Images
+
+`(:use [bulldozer.api.bing])`
+
+* `(get-image "cat")` - random unified image with cat
+* `(get-raw-image "cat")` - random bing-specific image, properties [here](https://developers.google.com/image-search/v1/devguide#resultobject)
+* `(invalidate-cache)` - clear all pictures saved to all keyword caches
+* `(invalidate-cache "cat")` - clear all pictures saved to "cat"-cache 
+
+Bing provides `5000` requests per month and one request returns upto `50` images, what is approximately `250K` images/month.
+
+One search query could return upto `1000` results.
 
 ## License
 

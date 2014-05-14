@@ -1,10 +1,10 @@
 # Plan
 
-## Sources (full doc + limitations)
+## Sources
 
 - Images
-  - Imgur (free 12500 requests per day)
-  - Google Images (64 images per query)
+  - Imgur **DONE**
+  - Google Images **DONE**
   - Instagram
   - Pinterest
   - Yahoo Images
@@ -15,14 +15,9 @@
   - Google
   - Twitter
   - Generate from English Grammar
+  - Name generator
 
 - Code
   - Github
   - Gist
   - Ohloh
-
-
-## Unified API
-
-- Images
-- Text

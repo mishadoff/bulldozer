@@ -5,6 +5,8 @@
 
 (def ^:private RANDOM_ENDPOINT
   "https://api.imgur.com/3/gallery/random/random/")
+
+;; TODO pagesize?
 (def ^:private SEARCH_ENDPOINT
   "https://api.imgur.com/3/gallery/search/time/0?")
 (def ^:private CREDIT_ENDPOINT
@@ -115,14 +117,13 @@ with a maximum side of 160"
   "Convert imgur image properties to unified image format.
 
 Unified image format consist of following properties:
-[:id :source :width :height :link :title :content
-     :preview-link :preview-height :preview-width] 
+[:id :source :width :height :link :title
+ :preview-link :preview-height :preview-width] 
 "
   [{:keys [id
            width
            height
            link
-           description
            title] :as imgur-image}]
   (when imgur-image
     (let [[pw ph] (scaled-size width height)]
@@ -130,7 +131,7 @@ Unified image format consist of following properties:
        :link link :preview-link (link-scale link :t) 
        :width width :preview-width pw
        :height height :preview-height ph
-       :title title :content description})))
+       :title title})))
 
 (defn get-image
   ([] (unify (get-raw-image)))
