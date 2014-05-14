@@ -5,10 +5,10 @@
 - Images
   - Imgur **DONE**
   - Google Images **DONE**
+  - Bing Images **DONE**
   - Instagram
   - Pinterest
   - Yahoo Images
-  - Bing Images
   - Flickr
 
 - Text

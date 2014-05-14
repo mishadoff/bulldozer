@@ -6,6 +6,8 @@
 
 (def ^:private IMAGES_ENDPOINT
   "https://api.datamarket.azure.com/Bing/Search/Image")
+(def ^:private QUOTA_ENDPOINT
+  "https://api.datamarket.azure.com/Services/My/Datasets?$format=json")
 
 (def ^:dynamic *ACCOUNT_KEY*
   "21dm2MDccB3Zwq1OWwgGhd0Ej2/kSRz2SVDT3reRu3I=")
@@ -21,6 +23,15 @@
        :d
        :results))
 
+(defn- quota []
+  (->> (http/get QUOTA_ENDPOINT
+                 {:basic-auth [*ACCOUNT_KEY* *ACCOUNT_KEY*]})
+       :body
+       (#(json/read-str % :key-fn keyword))
+       :d
+       :results
+       (first)
+       :ResourceBalance))
 
 (def ^:private query-cache (atom {}))
 
@@ -64,3 +75,7 @@ Unified image format consist of following properties:
      :height (Integer/parseInt Height)
      :preview-height (Integer/parseInt (:Height Thumbnail))
      :title Title}))
+
+(defn get-image [query]
+  "Return one unified image"
+  (unify (get-raw-image query)))

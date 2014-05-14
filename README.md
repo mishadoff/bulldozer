@@ -53,8 +53,8 @@ internally and refreshed when images are exhausted. Such cache can be invalidate
   * **:l** (large thumbnail 640x640)
   * **:h** (huge thumbnail 1024x1024)
 * `(quota)` - api usage info
-  * `(:UserRemaining (quota))` => 491
-  * `(:ClientRemaining (quota))` => 12491
+  * `(:UserRemaining (quota)) => 491`
+  * `(:ClientRemaining (quota)) => 12491`
 * `(invalidate-cache)` - clear all pictures saved to random cache
 * `(invalidate-cache "cat")` - clear all pictures saved to "cat"-cache 
 
@@ -94,8 +94,9 @@ One search query could return upto `64` results.
 * `(get-image "cat")` - random unified image with cat
 * `(get-raw-image "cat")` - random bing-specific image, properties [here](https://developers.google.com/image-search/v1/devguide#resultobject)
 * `(invalidate-cache)` - clear all pictures saved to all keyword caches
-* `(invalidate-cache "cat")` - clear all pictures saved to "cat"-cache 
-
+* `(invalidate-cache "cat")` - clear all pictures saved to "cat"-cache
+* `(quota)` - remaining number of requests per month 
+  * `(quota) => 4987`
 Bing provides `5000` requests per month and one request returns upto `50` images, what is approximately `250K` images/month.
 
 One search query could return upto `1000` results.
