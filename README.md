@@ -8,10 +8,7 @@ Gather data.
 - [Google Images](https://www.google.com.ua/imghp)
 - [Bing Images](http://bing.com/)
 - [Instagram](http://instagram.com)
-
-*In development* 
-
-- [Gist](http://gist.github.com/) (In development)
+- [Flickr](http://flickr.com)
 
 ## Images
 
@@ -116,6 +113,17 @@ One search query could return upto `1000` results.
 * `(quota)` - check remaining quota. *Consumes 1 request*
   
 Instagram provides `5000` requests per hour and one request returns upto `20` images, what is approximately `100K` images/hour.
+
+### Flickr
+
+`(:use [bulldozer.api.flickr])`
+
+* `(get-image)` - random recent unified image
+* `(get-image "cat")` - random unified image with `cat`
+* `(get-raw-image)` - random recent flickr image
+* `(get-raw-image "cat")` - random flickr image with `cat`
+  
+Flickr provides `3600` requests per hour and one request returns upto `100` images, what is approximately `360K` images/hour.
 
 ## License
 

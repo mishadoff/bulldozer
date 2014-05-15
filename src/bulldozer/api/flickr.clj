@@ -4,8 +4,6 @@
             [bulldozer.cache :as cache]
             [bulldozer.utils :as u]))
 
-;; https://www.flickr.com/services/api/misc.urls.html
-
 (def ^:dynamic *APP_KEY*
   "29e9c67966b744e0d06e1961e1bb2dd9")
 
