@@ -97,7 +97,6 @@ One search query could return upto `64` results.
 * `(invalidate-cache)` - clear all pictures saved to all keyword caches
 * `(invalidate-cache "cat")` - clear all pictures saved to "cat"-cache
 * `(quota)` - remaining number of requests per month 
-  * `(quota) => 4987`
   
 Bing provides `5000` requests per month and one request returns upto `50` images, what is approximately `250K` images/month.
 

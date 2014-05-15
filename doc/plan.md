@@ -6,7 +6,7 @@
   - Imgur **DONE**
   - Google Images **DONE**
   - Bing Images **DONE**
-  - Instagram
+  - Instagram **DONE**
   - Pinterest
   - Yahoo Images
   - Flickr
