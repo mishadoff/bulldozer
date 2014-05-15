@@ -13,7 +13,7 @@
   "https://api.flickr.com/services/rest/")
 
 (def ^:private EXTRAS
-  "url_o,url_t")
+  "url_z,url_t")
 
 (defn- popstring
   "Flickr return jsonFlickrApi([json])
@@ -38,7 +38,9 @@ we need just [json]"
        popstring
        (#(json/read-str % :key-fn keyword))
        :photos
-       :photo))
+       :photo
+       (filterv :url_z) ;; only images where original link available
+       )) 
 
 ;;; CACHE ;;;
 
@@ -73,33 +75,26 @@ Unified image format consist of following properties:
  :preview-link :preview-height :preview-width] 
 "
   [{:keys [id
-           url_o
-           height_o
-           width_o
+           url_z
+           height_z
+           width_z
            url_t
            width_t
            height_t
            title] :as flickr-image}]
   (when flickr-image
     {:id id :source :flickr
-     :link url_o
+     :link url_z
      :preview-link url_t
-     :width (u/safe-parse-int width_o)
+     :width (u/safe-parse-int width_z)
      :preview-width (u/safe-parse-int  width_t)
-     :height (u/safe-parse-int height_o)
+     :height (u/safe-parse-int height_z)
      :preview-height (u/safe-parse-int height_t)
      :title title}
     ))
 
-(defn- get-raw-image-continuos
-  "Continuosly obtain image.
-If image does not contain original url, repeat reques"
-  [query]
-  (let [ri (get-raw-image query)]
-    (if (:url_o ri) ri (get-raw-image-continuos query))))
-
 (defn get-image [query]
-  (unify (get-raw-image-continuos query)))
+  (unify (get-raw-image query)))
 
 
 ;; TODO quota
