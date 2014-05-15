@@ -1,7 +1,8 @@
 (ns bulldozer.api.flickr
   (:require [clj-http.client :as http]
             [clojure.data.json :as json]
-            [bulldozer.cache :as cache]))
+            [bulldozer.cache :as cache]
+            [bulldozer.utils :as u]))
 
 ;; https://www.flickr.com/services/api/misc.urls.html
 
@@ -12,7 +13,7 @@
   "https://api.flickr.com/services/rest/")
 
 (def ^:private EXTRAS
-  "o_dims,url_t,url_o")
+  "url_o,url_t")
 
 (defn- popstring
   "Flickr return jsonFlickrApi([json])
@@ -49,7 +50,7 @@ we need just [json]"
 
 ;;;;;;;;;;;;
 
-(defn- get-raw-image
+(defn get-raw-image
   "Obtain one random image by specified keyword.
 Return results according to service."
   ([query]
@@ -83,11 +84,24 @@ Unified image format consist of following properties:
     {:id id :source :flickr
      :link url_o
      :preview-link url_t
-     :width (Integer/parseInt width_o)
-     :preview-width (Integer/parseInt width_t)
-     :height (Integer/parseInt height_o)
-     :preview-height (Integer/parseInt height_t)
-     :title title}))
+     :width (u/safe-parse-int width_o)
+     :preview-width (u/safe-parse-int  width_t)
+     :height (u/safe-parse-int height_o)
+     :preview-height (u/safe-parse-int height_t)
+     :title title}
+    ))
+
+(defn- get-raw-image-continuos
+  "Continuosly obtain image.
+If image does not contain original url, repeat reques"
+  [query]
+  (let [ri (get-raw-image query)]
+    (if (:url_o ri) ri (get-raw-image-continuos query))))
 
 (defn get-image [query]
-  (unify (get-raw-image query)))
+  (unify (get-raw-image-continuos query)))
+
+
+;; TODO quota
+;; TODO recent
+;; TODO originals
