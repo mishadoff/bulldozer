@@ -15,39 +15,61 @@
 (def ^:private EXTRAS
   "url_z,url_t")
 
+(def ^:private SEARCH_MAP
+  {;"method" "flickr.photos.search"
+   "name" "value"
+   "format" "json"
+   "api_key" *APP_KEY*
+;   "text" query
+;   "start" page
+   "extras" EXTRAS})
+
 (defn- popstring
   "Flickr return jsonFlickrApi([json])
 we need just [json]"
   [s]
   (subs s 14 (dec (count s))))
 
-(defn- get-images-for-page
-  [query page]
-  "return one page of flickr images by query"
-  (->> (http/get SERVICE_ENDPOINT
-                 {:query-params
-                  {"method" "flickr.photos.search"
-                   "name" "value"
-                   "format" "json"
-                   "api_key" *APP_KEY*
-                   "text" query
-                   "start" page
-                   "extras" EXTRAS
-                   }})
+(defn- flickr-page-processor [response]
+  (->> response
        :body
        popstring
        (#(json/read-str % :key-fn keyword))
        :photos
        :photo
        (filterv :url_z) ;; only images where original link available
-       )) 
+       ))
+
+(defn- get-images-for-page
+  "return one page of flickr images by query"
+  ([query page]
+     (->> (http/get SERVICE_ENDPOINT
+                    {:query-params
+                     (assoc SEARCH_MAP
+                       "method" "flickr.photos.search"
+                       "text" query
+                       "start" page)})
+          flickr-page-processor))
+  ([page]
+     (->> (http/get SERVICE_ENDPOINT
+                    {:query-params
+                     (assoc SEARCH_MAP
+                       "method" "flickr.photos.getRecent"
+                       "start" page)})
+          flickr-page-processor)))
 
 ;;; CACHE ;;;
 
 (def ^:private query-cache (atom {}))
+(def ^:private random-cache (cache/create-cache
+                             #(get-images-for-page %)
+                             :skip 0
+                             :pagesize 1))
 
 (defn invalidate-cache
-  ([] (reset! query-cache {}))
+  ([]
+     (reset! random-cache {})
+     (reset! query-cache {}))
   ([query] (swap! query-cache dissoc query)))
 
 ;;;;;;;;;;;;
@@ -55,6 +77,7 @@ we need just [json]"
 (defn get-raw-image
   "Obtain one random image by specified keyword.
 Return results according to service."
+  ([] (cache/retrieve random-cache))
   ([query]
      (let [cache (get @query-cache query)]
        (if cache
@@ -93,10 +116,8 @@ Unified image format consist of following properties:
      :title title}
     ))
 
-(defn get-image [query]
-  (unify (get-raw-image query)))
-
+(defn get-image
+  ([] (unify (get-raw-image)))
+  ([query] (unify (get-raw-image query))))
 
 ;; TODO quota
-;; TODO recent
-;; TODO originals

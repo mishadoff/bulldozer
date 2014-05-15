@@ -52,7 +52,9 @@ numbers and underscore"
                              :next-url true))
 
 (defn invalidate-cache
-  ([] (reset! query-cache {}))
+  ([]
+     (reset! random-cache {})
+     (reset! query-cache {}))
   ([query] (swap! query-cache dissoc query)))
 
 ;;;;;;;;;;;;
