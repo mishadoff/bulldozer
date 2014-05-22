@@ -2,6 +2,7 @@
   (:require [clj-http.client :as http])
   (:require [clojure.data.json :as json]))
 
+;; TODO document limits
 ;; Authenticated user 5000 per hour
 ;; Other 60
 
