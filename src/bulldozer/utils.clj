@@ -12,3 +12,11 @@
 
 (defn safe-parse-int [s]
   (if (empty? s) nil (Integer/parseInt s)))
+
+
+(defn fetch-to-file
+  "Retrieve image from link to local file"
+  [url file]
+  (with-open [in (io/input-stream url) 
+              out (io/output-stream file)]
+    (io/copy in out)))
