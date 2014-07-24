@@ -50,3 +50,25 @@ with a maximum side of <max>"
    [max (Math/round (/ height (double (/ width max))))]
    :else
    [(Math/round (/ width (double (/ height max)))) max]))
+
+
+;; Debug
+
+(defn thread-debug
+  "Dumb function to simplify thread macro debugging
+
+(->> initial-data
+     (a 10)
+     (b \"string\"))
+
+transforms to
+
+(->> initial-data
+     (a 10)
+     (thread-debug)
+     (b \"string\"))
+
+and print value after evaluation (a 10)"
+  [value]
+  (println value)
+  value)

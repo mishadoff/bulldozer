@@ -1,7 +1,8 @@
 (ns bulldozer.api.google
   (:require [clj-http.client :as http]
             [clojure.data.json :as json]
-            [bulldozer.cache :as cache]))
+            [bulldozer.cache :as cache]
+            [bulldozer.utils :as u]))
 
 (def ^:private IMAGES_API
   "http://ajax.googleapis.com/ajax/services/search/images?v=1.0")
