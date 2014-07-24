@@ -1,7 +1,8 @@
 (ns bulldozer.api.imgur
   (:require [clj-http.client :as http]
             [clojure.data.json :as json]
-            [bulldozer.cache :as cache]))
+            [bulldozer.cache :as cache]
+            [bulldozer.utils :as u]))
 
 (def ^:private RANDOM_ENDPOINT
   "https://api.imgur.com/3/gallery/random/random/")
@@ -94,16 +95,7 @@ response until cache is exhausted.
            (swap! query-cache assoc query cache)
            (cache/retrieve cache))))))
 
-(defn- scaled-size [width height]
-  "Scale size width x height to smaller
-with a maximum side of 160"
-  (cond
-   (and (<= width 160) (<= height 160))
-   [width height]
-   (>= width height)
-   [160 (Math/round (/ height (double (/ width 160))))]
-   :else
-   [(Math/round (/ width (double (/ height 160)))) 160]))
+
 
 ;;;;   Additional methods
 
@@ -126,7 +118,7 @@ Unified image format consist of following properties:
            link
            title] :as imgur-image}]
   (when imgur-image
-    (let [[pw ph] (scaled-size width height)]
+    (let [[pw ph] (u/scaled-size width height 160)]
       {:id id :source :imgur
        :link link :preview-link (link-scale link :t) 
        :width width :preview-width pw

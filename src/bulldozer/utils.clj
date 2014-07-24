@@ -27,8 +27,6 @@
               out (clojure.java.io/output-stream file)]
     (clojure.java.io/copy in out)))
 
-;; TODO fetch images to folder
-
 (defn fetch-to-folder
   "Use provided fetch function <fetch-fn >sequentially obtain function and save it to the folder provided by <path> param. Limit param specifies the number of images retrieved.
 Specified folder must exist and must not end with / 
@@ -39,3 +37,16 @@ Specified folder must exist and must not end with /
           gen-name (gen-file-name (:link image))
           file-path (str path "/" gen-name ".jpg")]
       (fetch-to-file (:link image) file-path))))
+
+;; Images
+
+(defn scaled-size [width height max]
+  "Scale size <width> x <height> to smaller
+with a maximum side of <max>"
+  (cond
+   (and (<= width max) (<= height max))
+   [width height]
+   (>= width height)
+   [max (Math/round (/ height (double (/ width max))))]
+   :else
+   [(Math/round (/ width (double (/ height max)))) max]))

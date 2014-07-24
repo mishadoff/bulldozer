@@ -106,9 +106,6 @@ Unified image format consist of following properties:
                  {:query-params {"q" query
                                  "client_id" *CLIENT_ID*}})
        :body
-
-
-
        (#(json/read-str % :key-fn keyword))
        :data
        (map :name)))
