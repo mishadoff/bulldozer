@@ -1,4 +1,4 @@
-(ns bulldozer.api.bing
+(ns bulldozer.images.bing
   (:require [clj-http.client :as http]
             [clojure.data.json :as json]
             [bulldozer.cache :as cache]

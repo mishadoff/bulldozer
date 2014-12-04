@@ -1,4 +1,4 @@
-(ns bulldozer.api.imgur
+(ns bulldozer.images.imgur
   (:require [clj-http.client :as http]
             [clojure.data.json :as json]
             [bulldozer.cache :as cache]

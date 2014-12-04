@@ -1,34 +1,32 @@
-(ns bulldozer.api.flickr
+(ns bulldozer.images.flickr
+  "Retrieve images from flickr"
   (:require [clj-http.client :as http]
             [clojure.data.json :as json]
             [bulldozer.cache :as cache]
-            [bulldozer.utils :as u]))
+            [bulldozer.utils :as u]
+            [bulldozer.images.keys :refer [*flickr-app-key*]]))
 
-(def ^:dynamic *APP_KEY*
-  "29e9c67966b744e0d06e1961e1bb2dd9")
-
-(def ^:private SERVICE_ENDPOINT
-  "https://api.flickr.com/services/rest/")
-
-(def ^:private EXTRAS
-  "url_z,url_t")
-
-(def ^:private SEARCH_MAP
-  {;"method" "flickr.photos.search"
+(def ^:private service-endpoint "https://api.flickr.com/services/rest/")
+(def ^:private extras "url_z,url_t")
+;; search-map prototype
+(def ^:private search-map 
+  {"method" "flickr.photos.search"
    "name" "value"
    "format" "json"
-   "api_key" *APP_KEY*
-;   "text" query
-;   "start" page
-   "extras" EXTRAS})
+   "api_key" *flickr-app-key*
+   "text" nil
+   "start" nil
+   "extras" extras})
 
+;; TODO: UTIL
 (defn- popstring
-  "Flickr return jsonFlickrApi([json])
-we need just [json]"
+  "Flickr return jsonFlickrApi([json]) we need just [json]"
   [s]
   (subs s 14 (dec (count s))))
 
-(defn- flickr-page-processor [response]
+(defn- flickr-page-processor
+  "Process flickr response and return list of raw images"
+  [response]
   (->> response
        :body
        popstring
@@ -41,17 +39,17 @@ we need just [json]"
 (defn- get-images-for-page
   "return one page of flickr images by query"
   ([query page]
-     (->> (http/get SERVICE_ENDPOINT
+     (->> (http/get service-endpoint
                     {:query-params
-                     (assoc SEARCH_MAP
+                     (assoc search-map
                        "method" "flickr.photos.search"
                        "text" query
                        "start" page)})
           flickr-page-processor))
   ([page]
-     (->> (http/get SERVICE_ENDPOINT
+     (->> (http/get service-endpoint
                     {:query-params
-                     (assoc SEARCH_MAP
+                     (assoc search-map
                        "method" "flickr.photos.getRecent"
                        "start" page)})
           flickr-page-processor)))

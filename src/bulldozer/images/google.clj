@@ -1,4 +1,4 @@
-(ns bulldozer.api.google
+(ns bulldozer.images.google
   (:require [clj-http.client :as http]
             [clojure.data.json :as json]
             [bulldozer.cache :as cache]
